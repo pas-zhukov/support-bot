@@ -24,7 +24,7 @@ def main():
     admin_chat_id = os.getenv('ADMIN_CHAT_ID')
     if admin_tg_bot_token and admin_chat_id:
         logger.addHandler(TGLogsHandler(admin_tg_bot_token, admin_chat_id))
-        logger.warning('Successfully begin logging into admin chat.')
+        logger.warning('Successfully began logging into admin chat.')
 
     vk_session = vk.VkApi(token=vk_bot_token)
     vk_api = vk_session.get_api()

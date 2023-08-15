@@ -16,7 +16,7 @@ def main():
     """Main function."""
     logging.basicConfig(
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-        level=logging.DEBUG
+        level=logging.INFO
     )
 
     load_dotenv()

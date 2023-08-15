@@ -14,7 +14,7 @@ logger = logging.getLogger('VKBot')
 
 def main():
     """Main function."""
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging.INFO)
 
     load_dotenv()
     vk_bot_token = os.getenv('VK_BOT_TOKEN')

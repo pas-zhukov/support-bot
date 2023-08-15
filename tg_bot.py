@@ -7,7 +7,7 @@ from telegram import Update
 from telegram.ext import filters, MessageHandler, ApplicationBuilder, CommandHandler, ContextTypes
 
 from dialogflow import detect_intent_texts
-
+from logshandler import TGLogsHandler
 
 logger = logging.getLogger('TGBot')
 
@@ -22,6 +22,12 @@ def main():
     load_dotenv()
     tg_bot_token = os.getenv('TG_BOT_TOKEN')
     df_project_id = os.getenv('DIALOGFLOW_PROJECT_ID')
+    admin_tg_bot_token = os.getenv('ADMIN_TG_BOT_TOKEN')
+    admin_chat_id = os.getenv('ADMIN_CHAT_ID')
+    if admin_tg_bot_token and admin_chat_id:
+        logger.addHandler(TGLogsHandler(admin_tg_bot_token, admin_chat_id))
+        logger.warning('Successfully begin logging into admin chat.')
+
     application = ApplicationBuilder().token(tg_bot_token).build()
 
     start_handler = CommandHandler('start', start)

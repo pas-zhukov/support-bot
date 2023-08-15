@@ -6,6 +6,7 @@ from google.cloud import api_keys_v2
 from google.cloud.api_keys_v2 import Key
 import requests
 
+
 logger = logging.getLogger("DialogFlow")
 
 
@@ -42,8 +43,10 @@ def create_api_key(project_id: str, suffix: str) -> Key:
 def detect_intent_texts(project_id: str,
                         session_id: str or int,
                         text: str,
-                        language_code: str = "ru-RU") -> str:
+                        language_code: str = "ru-RU") -> str or bool:
     """Returns the result of detect intent with text as input.
+
+    Returns False if Bot is in Fallback.
 
     Args:
         project_id (str): ID of your DialogFlow project
@@ -53,6 +56,7 @@ def detect_intent_texts(project_id: str,
 
     Returns:
         str: DialogFlow Agent answer
+        False: If Fallback
     """
 
     session_client = dialogflow.SessionsClient()
@@ -74,6 +78,8 @@ def detect_intent_texts(project_id: str,
     )
     logger.debug("Fulfillment text: {}\n".format(response.query_result.fulfillment_text))
 
+    if response.query_result.intent.is_fallback:
+        return False
     return response.query_result.fulfillment_text
 
 

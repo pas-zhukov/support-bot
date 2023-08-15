@@ -8,7 +8,7 @@ from telegram.ext import filters, MessageHandler, ApplicationBuilder, CommandHan
 from dialogflow import detect_intent_texts
 
 
-logger = logging.getLogger('SupportBot')
+logger = logging.getLogger('TGBot')
 
 
 def main():

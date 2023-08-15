@@ -8,7 +8,7 @@ from vk_api.longpoll import VkLongPoll, VkEventType
 
 from dialogflow import detect_intent_texts
 
-logger = logging.getLogger('SupportBot')
+logger = logging.getLogger('VKBot')
 
 
 def main():
@@ -28,11 +28,12 @@ def main():
 
 def echo(event, vk_api, df_project_id):
     dialogflow_answer = detect_intent_texts(df_project_id, event.user_id, event.text)
-    vk_api.messages.send(
-        user_id=event.user_id,
-        message=dialogflow_answer,
-        random_id=random.randint(1,1000)
-    )
+    if dialogflow_answer:
+        vk_api.messages.send(
+            user_id=event.user_id,
+            message=dialogflow_answer,
+            random_id=random.randint(1,1000)
+        )
 
 
 if __name__ == '__main__':

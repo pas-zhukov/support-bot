@@ -1,3 +1,4 @@
+"""Support Bot for Telegram."""
 import logging
 import os
 
@@ -12,6 +13,7 @@ logger = logging.getLogger('TGBot')
 
 
 def main():
+    """Main function."""
     logging.basicConfig(
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
         level=logging.DEBUG
@@ -23,7 +25,7 @@ def main():
     application = ApplicationBuilder().token(tg_bot_token).build()
 
     start_handler = CommandHandler('start', start)
-    echo_handler = MessageHandler(filters.TEXT & (~filters.COMMAND), echo)
+    echo_handler = MessageHandler(filters.TEXT & (~filters.COMMAND), reply_to_msg)
 
     application.add_handler(start_handler)
     application.add_handler(echo_handler)
@@ -32,13 +34,20 @@ def main():
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await context.bot.send_message(chat_id=update.effective_chat.id, text="Привет! Я бот поддержки, чем могу помочь?")
+    """Send hello message when `/start` command is passed."""
+    await context.bot.send_message(chat_id=update.effective_chat.id,
+                                   text="Привет! Я бот поддержки, чем могу помочь?")
 
 
-async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def reply_to_msg(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Reply to a user message using DialogFlow."""
     df_project_id = os.getenv('DIALOGFLOW_PROJECT_ID')
-    dialogflow_answer = detect_intent_texts(df_project_id, update.message.from_user.id, update.message.text)
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=dialogflow_answer)
+    dialogflow_response = detect_intent_texts(df_project_id,
+                                              update.message.from_user.id,
+                                              update.message.text)
+    dialogflow_answer = dialogflow_response.query_result.fulfillment_text
+    await context.bot.send_message(chat_id=update.effective_chat.id,
+                                   text=dialogflow_answer)
 
 
 if __name__ == '__main__':

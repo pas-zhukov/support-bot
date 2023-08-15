@@ -1,3 +1,4 @@
+"""Support Bot for VK social net."""
 import logging
 import os
 import random
@@ -12,6 +13,7 @@ logger = logging.getLogger('VKBot')
 
 
 def main():
+    """Main function."""
     logging.basicConfig(level=logging.DEBUG)
 
     load_dotenv()
@@ -23,16 +25,22 @@ def main():
     longpoll = VkLongPoll(vk_session)
     for event in longpoll.listen():
         if event.type == VkEventType.MESSAGE_NEW and event.to_me:
-            echo(event, vk_api, df_project_id)
+            answer_msg(event, vk_api, df_project_id)
 
 
-def echo(event, vk_api, df_project_id):
-    dialogflow_answer = detect_intent_texts(df_project_id, event.user_id, event.text)
-    if dialogflow_answer:
+def answer_msg(event, vk_api, df_project_id):
+    """Reply to users message using DialogFlow.
+
+    Replies only if DialogFlow response not in fallback.
+    """
+    dialogflow_response = detect_intent_texts(df_project_id,
+                                              event.user_id,
+                                              event.text)
+    if not dialogflow_response.query_result.intent.is_fallback:
         vk_api.messages.send(
             user_id=event.user_id,
-            message=dialogflow_answer,
-            random_id=random.randint(1,1000)
+            message=dialogflow_response.query_result.fulfillment_text,
+            random_id=random.randint(1, 1000)
         )
 
 

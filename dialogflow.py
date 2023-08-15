@@ -1,3 +1,4 @@
+"""Functions for interacting with DialogFlow API."""
 import json
 import logging
 
@@ -20,18 +21,15 @@ def create_api_key(project_id: str, suffix: str) -> Key:
     Returns:
         response: Returns the created API Key.
     """
-    # Create the API Keys client.
     client = api_keys_v2.ApiKeysClient()
 
     key = api_keys_v2.Key()
     key.display_name = f"My first API key - {suffix}"
 
-    # Initialize request and set arguments.
     request = api_keys_v2.CreateKeyRequest()
     request.parent = f"projects/{project_id}/locations/global"
     request.key = key
 
-    # Make the request and wait for the operation to complete.
     response = client.create_key(request=request).result()
 
     print(f"Successfully created an API key: {response.name}")
@@ -43,10 +41,10 @@ def create_api_key(project_id: str, suffix: str) -> Key:
 def detect_intent_texts(project_id: str,
                         session_id: str or int,
                         text: str,
-                        language_code: str = "ru-RU") -> str or bool:
-    """Returns the result of detect intent with text as input.
+                        language_code: str = "ru-RU") -> dialogflow.DetectIntentResponse:
+    """Return the result of detect intent with text as input.
 
-    Returns False if Bot is in Fallback.
+    Returns False if DialogFlow Bot is in Fallback.
 
     Args:
         project_id (str): ID of your DialogFlow project
@@ -55,10 +53,8 @@ def detect_intent_texts(project_id: str,
         language_code (str): Language code in 'en-US' format
 
     Returns:
-        str: DialogFlow Agent answer
-        False: If Fallback
+        DetectIntentResponse: DialogFlow Agent response
     """
-
     session_client = dialogflow.SessionsClient()
     session = session_client.session_path(project_id, session_id)
     logger.debug("Session path: {}\n".format(session))
@@ -78,9 +74,7 @@ def detect_intent_texts(project_id: str,
     )
     logger.debug("Fulfillment text: {}\n".format(response.query_result.fulfillment_text))
 
-    if response.query_result.intent.is_fallback:
-        return False
-    return response.query_result.fulfillment_text
+    return response
 
 
 def create_intent(project_id: str,
@@ -107,7 +101,9 @@ def create_intent(project_id: str,
     text = dialogflow.Intent.Message.Text(text=message_texts)
     message = dialogflow.Intent.Message(text=text)
 
-    intent = dialogflow.Intent(display_name=display_name, training_phrases=training_phrases, messages=[message])
+    intent = dialogflow.Intent(display_name=display_name,
+                               training_phrases=training_phrases,
+                               messages=[message])
     response = intents_client.create_intent(request={"parent": parent, "intent": intent})
     logger.debug("Intent created: {}".format(response))
 

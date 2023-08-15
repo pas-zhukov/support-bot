@@ -2,3 +2,5 @@ python-telegram-bot==20.4
 google-cloud-api-keys==0.5.3
 google-cloud-dialogflow==2.23.3
 requests~=2.31.0
+python-dotenv
+vk_api==11.9.9

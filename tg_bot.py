@@ -7,27 +7,19 @@ from telegram.ext import filters, MessageHandler, ApplicationBuilder, CommandHan
 
 from dialogflow import detect_intent_texts
 
-logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    level=logging.DEBUG
-)
+
 logger = logging.getLogger('SupportBot')
 
-DIALOGFLOW_PROJECT_ID = 'support-bot-devman'
 
+def main():
+    logging.basicConfig(
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        level=logging.DEBUG
+    )
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await context.bot.send_message(chat_id=update.effective_chat.id, text="Привет! Я бот поддержки, чем могу помочь?")
-
-
-async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    dialogflow_answer = detect_intent_texts(DIALOGFLOW_PROJECT_ID, update.message.from_user.id, update.message.text)
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=dialogflow_answer)
-
-
-if __name__ == '__main__':
     load_dotenv()
     tg_bot_token = os.getenv('TG_BOT_TOKEN')
+    df_project_id = os.getenv('DIALOGFLOW_PROJECT_ID')
     application = ApplicationBuilder().token(tg_bot_token).build()
 
     start_handler = CommandHandler('start', start)
@@ -37,3 +29,17 @@ if __name__ == '__main__':
     application.add_handler(echo_handler)
 
     application.run_polling()
+
+
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await context.bot.send_message(chat_id=update.effective_chat.id, text="Привет! Я бот поддержки, чем могу помочь?")
+
+
+async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    df_project_id = os.getenv('DIALOGFLOW_PROJECT_ID')
+    dialogflow_answer = detect_intent_texts(df_project_id, update.message.from_user.id, update.message.text)
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=dialogflow_answer)
+
+
+if __name__ == '__main__':
+    main()

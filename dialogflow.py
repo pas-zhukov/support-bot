@@ -1,7 +1,11 @@
 """Functions for interacting with DialogFlow API."""
+import os
+from argparse import ArgumentParser
 import json
 import logging
+import validators
 
+from dotenv import load_dotenv
 from google.cloud import dialogflow
 from google.cloud import api_keys_v2
 from google.cloud.api_keys_v2 import Key
@@ -109,12 +113,33 @@ def create_intent(project_id: str,
 
 
 if __name__ == "__main__":
-    training_json_url = 'https://dvmn.org/media/filer_public/a7/db/a7db66c0-1259-4dac-9726-2d1fa9c44f20/questions.json'
-    response = requests.get(training_json_url)
-    response.raise_for_status()
-    training_questions = json.loads(response.content)
+    load_dotenv()
+    project_id = os.getenv('DIALOGFLOW_PROJECT_ID')
 
-    for topic in training_questions.keys():
-        questions = training_questions[topic]['questions']
-        answer = training_questions[topic]['answer']
-        create_intent('support-bot-devman', topic, questions, [answer])
+    arg_parser = ArgumentParser(
+        description='Скрипт для автозагрузки интентов в агента DialogFlow'
+    )
+    arg_parser.add_argument(
+        'jf',
+        help="Путь/ссылка к Вашему json-файлу.",
+        type=str,
+        default='https://dvmn.org/media/filer_public/a7/db/a7db66c0-1259-4dac-9726-2d1fa9c44f20/questions.json'
+    )
+    args = arg_parser.parse_args()
+    file_source = args.jf
+
+    if validators.url(file_source):
+        response = requests.get(file_source)
+        response.raise_for_status()
+        training_questions = response.json()
+    else:
+        try:
+            with open(file_source, 'rb') as file:
+                training_questions = json.load(file)
+        except FileNotFoundError:
+            raise FileNotFoundError('File not found! Check the JSON source path!')
+
+    for topic, intent in training_questions.items():
+        questions = intent['questions']
+        answer = intent['answer']
+        create_intent(project_id, topic, questions, [answer])

@@ -54,7 +54,7 @@ gcloud auth application-default login
 Если у Вас есть подготовленные данные для тренировки агента, можно сохранить их в json-файл ([пример правильной структуры файла](https://dvmn.org/media/filer_public/a7/db/a7db66c0-1259-4dac-9726-2d1fa9c44f20/questions.json)), а затем использовать специальный скрипт для их загрузки в агента DialogFlow:
 
 ```shell
-python dialogflow.py -p <Путь/ссылка к Ващему json-файлу>
+python dialogflow.py -jf <Путь/ссылка к Вашему json-файлу>
 ```
 
 ## Создание и подготовка ботов
